@@ -1,10 +1,10 @@
 import React from 'react'
 import Part from './Part'
 
-export default ({ part1, part2, part3 }) => (
+export default ({ parts }) => (
   <>
-    <Part part={part1} />
-    <Part part={part2} />
-    <Part part={part3} />
+    <Part part={parts[0]} />
+    <Part part={parts[1]} />
+    <Part part={parts[2]} />
   </>
 )
