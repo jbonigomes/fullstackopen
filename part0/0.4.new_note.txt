@@ -1,0 +1,7 @@
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+server-->browser: new HTML-code returned
+
+note over browser:
+the rest of the steps have been ommited as they
+are the exact same as the ones from the example
+end note
