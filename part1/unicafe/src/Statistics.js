@@ -7,12 +7,18 @@ export default ({ all, bad, good, neutral }) => {
   return (
     <>
       <h1>statistics</h1>
-      <div>good {good}</div>
-      <div>neutral {neutral}</div>
-      <div>bad {bad}</div>
-      <div>all {all}</div>
-      <div>average {getAverage()}</div>
-      <div>positive {getPositive()} %</div>
+      {all ? (
+        <>
+          <div>good {good}</div>
+          <div>neutral {neutral}</div>
+          <div>bad {bad}</div>
+          <div>all {all}</div>
+          <div>average {getAverage()}</div>
+          <div>positive {getPositive()} %</div>
+        </>
+      ) : (
+        <div>No feedback given</div>
+      )}
     </>
   )
 }
