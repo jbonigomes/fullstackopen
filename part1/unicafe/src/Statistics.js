@@ -1,4 +1,5 @@
 import React from 'react'
+import Statistic from './Statistic'
 
 export default ({ all, bad, good, neutral }) => {
   const getPositive = () => good * 100 / all
@@ -9,12 +10,12 @@ export default ({ all, bad, good, neutral }) => {
       <h1>statistics</h1>
       {all ? (
         <>
-          <div>good {good}</div>
-          <div>neutral {neutral}</div>
-          <div>bad {bad}</div>
-          <div>all {all}</div>
-          <div>average {getAverage()}</div>
-          <div>positive {getPositive()} %</div>
+          <Statistic text="good" value={good} />
+          <Statistic text="neutral" value={neutral} />
+          <Statistic text="bad" value={bad} />
+          <Statistic text="all" value={all} />
+          <Statistic text="average" value={getAverage()} />
+          <Statistic text="positive" value={`${getPositive()} %`} />
         </>
       ) : (
         <div>No feedback given</div>
