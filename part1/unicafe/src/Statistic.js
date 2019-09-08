@@ -1,5 +1,8 @@
 import React from 'react'
 
 export default ({ text, value }) => (
-  <div>{text} {value}</div>
+  <tr>
+    <td>{text}</td>
+    <td>{value}</td>
+  </tr>
 )

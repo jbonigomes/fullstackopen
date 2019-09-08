@@ -9,14 +9,16 @@ export default ({ all, bad, good, neutral }) => {
     <>
       <h1>statistics</h1>
       {all ? (
-        <>
-          <Statistic text="good" value={good} />
-          <Statistic text="neutral" value={neutral} />
-          <Statistic text="bad" value={bad} />
-          <Statistic text="all" value={all} />
-          <Statistic text="average" value={getAverage()} />
-          <Statistic text="positive" value={`${getPositive()} %`} />
-        </>
+        <table>
+          <tbody>
+            <Statistic text="good" value={good} />
+            <Statistic text="neutral" value={neutral} />
+            <Statistic text="bad" value={bad} />
+            <Statistic text="all" value={all} />
+            <Statistic text="average" value={getAverage()} />
+            <Statistic text="positive" value={`${getPositive()} %`} />
+          </tbody>
+        </table>
       ) : (
         <div>No feedback given</div>
       )}
