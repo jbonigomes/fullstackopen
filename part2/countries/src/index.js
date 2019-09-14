@@ -16,6 +16,10 @@ const App = () => {
     setSearch(e.target.value)
   }
 
+  const handleShow = (country) => () => {
+    setSearch(country)
+  }
+
   const filteredCountries = countries.filter((country) =>
     country.name.toLowerCase().includes(search.toLowerCase())
   )
@@ -34,7 +38,10 @@ const App = () => {
           ) : (search && filteredCountries.length > 1) ? (
             <>
               {filteredCountries.map((country) => (
-                <div key={country.alpha2Code}>{country.name}</div>
+                <div key={country.alpha2Code}>
+                  {country.name}
+                  <button onClick={handleShow(country.name)}>Show</button>
+                </div>
               ))}
             </>
           ) : (
