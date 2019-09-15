@@ -4,29 +4,17 @@ import axios from 'axios'
 
 const App = () => {
   const [ search, setSearch ] = useState('')
+  const [ weather, setWeather ] = useState(null)
   const [ countries, setCountries ] = useState([])
 
   useEffect(() => {
-    const init = async () => {
-      const key = 'access_key=cc3d8931e6fe66668440ee71ff21ef10'
-      const countriesUrl = 'https://restcountries.eu/rest/v2/all'
-      const weatherUrl = `http://api.weatherstack.com/current?${key}`
-
-      const countries = (await axios.get(countriesUrl)).data
-
-      for (let i = 0; i < countries.length; i++) {
-        const query = `query=${countries[i].capital}`
-        const weather = await axios.get(`${weatherUrl}&${query}`)
-        countries[i].weather = weather.current
-      }
-
-      setCountries(countries)
-    }
-
-    init()
+    axios
+      .get('https://restcountries.eu/rest/v2/all')
+      .then((res) => setCountries(res.data))
   }, [])
 
   const handleSearch = (e) => {
+    setWeather(null)
     setSearch(e.target.value)
   }
 
@@ -37,6 +25,15 @@ const App = () => {
   const filteredCountries = countries.filter((country) =>
     country.name.toLowerCase().includes(search.toLowerCase())
   )
+
+  if (filteredCountries.length === 1 && !weather) {
+    const query = `query=${filteredCountries[0].capital}`
+    const key = 'access_key=5b573d26e245bda8442bf3a982c41b6a'
+
+    axios
+      .get(`http://api.weatherstack.com/current?${key}&${query}`)
+      .then((res) => setWeather(res.data.current))
+  }
 
   return (
     <>
@@ -68,29 +65,26 @@ const App = () => {
                   <h3>languages</h3>
                   <ul>
                     {filteredCountries[0].languages.map((language) => (
-                      <li>{language.name}</li>
+                      <li key={language.iso639_1}>{language.name}</li>
                     ))}
                   </ul>
                   <img src={filteredCountries[0].flag} width="100" alt="flag" />
-                  {filteredCountries[0].weather && (
+                  <h3>Weather in {filteredCountries[0].name}</h3>
+                  {weather ? (
                     <>
-                      <h3>Weather in {filteredCountries[0].name}</h3>
                       <div>
-                        <b>temperature: </b>
-                        {filteredCountries[0].weather.temperature} Celsius
+                        <b>temperature: </b> {weather.temperature} Celsius
                       </div>
                       <div>
-                        <img
-                          alt="icon"
-                          src={filteredCountries[0].weather.weather_icons[0]}
-                        />
+                        <img alt="icon" src={weather.weather_icons[0]} />
                       </div>
                       <div>
                         <b>wind: </b>
-                        {filteredCountries[0].weather.wind_speed} kph {' '}
-                        direction {filteredCountries[0].weather.wind_dir}
+                        {weather.wind_speed} kph direction {weather.wind_dir}
                       </div>
                     </>
+                  ) : (
+                    <div>Loading weather...</div>
                   )}
                 </>
               )}
@@ -98,7 +92,7 @@ const App = () => {
           )}
         </>
       ) : (
-        <div>Loading...</div>
+        <div>Loading countries...</div>
       )}
     </>
   )
