@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
+import Error from './Error'
 import Filter from './Filter'
 import Persons from './Persons'
 import Success from './Success'
@@ -18,13 +19,15 @@ const App = () => {
   const [ persons, setPersons] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
-  const [ successMessage, setSuccessMessage] = useState('')
+  const [ errorMessage, setErrorMessage ] = useState('')
+  const [ successMessage, setSuccessMessage ] = useState('')
 
   useEffect(() => {
-    getPersons().then(persons => {
-      setPersons(persons)
-    })
+    getPersons().then(persons => setPersons(persons))
   }, [])
+
+  const getErrorMessage = (name) =>
+    `Information of ${name} has already been removed from server`
 
   const handleSearch = (e) => {
     setSearch(e.target.value)
@@ -41,40 +44,59 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
+    const msg = `
+      is already added to the phonebook, replace the old number with a new one?
+    `
+
     const exist = persons.find(
       (person) => person.name.toLowerCase() === newName.toLowerCase()
     )
 
     if (exist) {
-      if (window.confirm(
-        `${newName} is already added to the phonebook, replace the old number with a new one?`
-      )) {
-        updatePerson(exist.id, { name: exist.name, number: newNumber }).then((res) => {
-          setPersons(persons.map((person) => res.id === person.id ? res : person))
-          setNewName('')
-          setNewNumber('')
-          setSuccessMessage(`Updated ${exist.name}`)
-          setTimeout(() => setSuccessMessage(''), 5000)
-        })
+      if (window.confirm(`${newName} ${msg}`)) {
+        updatePerson(exist.id, { name: exist.name, number: newNumber })
+          .then((res) => {
+            setPersons(persons.map((prs) => res.id === prs.id ? res : prs))
+
+            setNewName('')
+            setNewNumber('')
+            setSuccessMessage(`Updated ${newName}`)
+            setTimeout(() => setSuccessMessage(''), 5000)
+          })
+          .catch(() => {
+            setErrorMessage(getErrorMessage(newName))
+            setTimeout(() => setErrorMessage(''), 5000)
+          })
       }
     } else {
-      createPerson({ name: newName, number: newNumber }).then((person) => {
-        setPersons(persons.concat(person))
-        setNewName('')
-        setNewNumber('')
-        setSuccessMessage(`Added ${person.name}`)
-        setTimeout(() => setSuccessMessage(''), 5000)
-      })
+      createPerson({ name: newName, number: newNumber })
+        .then((person) => {
+          setPersons(persons.concat(person))
+
+          setNewName('')
+          setNewNumber('')
+          setSuccessMessage(`Added ${person.name}`)
+          setTimeout(() => setSuccessMessage(''), 5000)
+        })
+        .catch(() => {
+          setErrorMessage(getErrorMessage(newName))
+          setTimeout(() => setErrorMessage(''), 5000)
+        })
     }
   }
 
   const handleDelete = (personToDelete) => () => {
     if (window.confirm(`Delete ${personToDelete.name}?`)) {
-      deletePerson(personToDelete.id).then(() => {
-        setPersons(persons.filter((person) => person.id !== personToDelete.id))
-        setSuccessMessage(`Deleted ${personToDelete.name}`)
-        setTimeout(() => setSuccessMessage(''), 5000)
-      })
+      deletePerson(personToDelete.id)
+        .then(() => {
+          setPersons(persons.filter((prs) => prs.id !== personToDelete.id))
+          setSuccessMessage(`Deleted ${personToDelete.name}`)
+          setTimeout(() => setSuccessMessage(''), 5000)
+        })
+        .catch(() => {
+          setErrorMessage(getErrorMessage(personToDelete.name))
+          setTimeout(() => setErrorMessage(''), 5000)
+        })
     }
   }
 
@@ -86,6 +108,7 @@ const App = () => {
     <>
       <h2>Phonebook</h2>
 
+      {errorMessage && <Error message={errorMessage} />}
       {successMessage && <Success message={successMessage} />}
 
       <Filter value={search} onChange={handleSearch} />
