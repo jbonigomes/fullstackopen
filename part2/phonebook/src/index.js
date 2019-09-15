@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 
 import Filter from './Filter'
 import Persons from './Persons'
+import Success from './Success'
 import PersonForm from './PersonForm'
 
 import {
@@ -17,6 +18,7 @@ const App = () => {
   const [ persons, setPersons] = useState([])
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
+  const [ successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     getPersons().then(persons => {
@@ -51,6 +53,8 @@ const App = () => {
           setPersons(persons.map((person) => res.id === person.id ? res : person))
           setNewName('')
           setNewNumber('')
+          setSuccessMessage(`Updated ${exist.name}`)
+          setTimeout(() => setSuccessMessage(''), 5000)
         })
       }
     } else {
@@ -58,6 +62,8 @@ const App = () => {
         setPersons(persons.concat(person))
         setNewName('')
         setNewNumber('')
+        setSuccessMessage(`Added ${person.name}`)
+        setTimeout(() => setSuccessMessage(''), 5000)
       })
     }
   }
@@ -66,6 +72,8 @@ const App = () => {
     if (window.confirm(`Delete ${personToDelete.name}?`)) {
       deletePerson(personToDelete.id).then(() => {
         setPersons(persons.filter((person) => person.id !== personToDelete.id))
+        setSuccessMessage(`Deleted ${personToDelete.name}`)
+        setTimeout(() => setSuccessMessage(''), 5000)
       })
     }
   }
@@ -77,6 +85,9 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
+
+      {successMessage && <Success message={successMessage} />}
+
       <Filter value={search} onChange={handleSearch} />
 
       <h2>Add a new</h2>
