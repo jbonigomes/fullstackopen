@@ -5,7 +5,7 @@ import Filter from './Filter'
 import Persons from './Persons'
 import PersonForm from './PersonForm'
 
-import { get, create } from './services/persons'
+import { getPersons, createPerson, deletePerson } from './services/persons'
 
 const App = () => {
   const [ search, setSearch ] = useState('')
@@ -14,7 +14,7 @@ const App = () => {
   const [ newNumber, setNewNumber ] = useState('')
 
   useEffect(() => {
-    get().then(persons => {
+    getPersons().then(persons => {
       setPersons(persons)
     })
   }, [])
@@ -38,13 +38,19 @@ const App = () => {
       return alert(`${newName} is already added to the phonebook`)
     }
 
-    const newPerson = { name: newName, number: newNumber }
-
-    create(newPerson).then((person) => {
+    createPerson({ name: newName, number: newNumber }).then((person) => {
       setPersons(persons.concat(person))
       setNewName('')
       setNewNumber('')
     })
+  }
+
+  const handleDelete = (personToDelete) => () => {
+    if (window.confirm(`Delete ${personToDelete.name}?`)) {
+      deletePerson(personToDelete.id).then(() => {
+        setPersons(persons.filter((person) => person.id !== personToDelete.id))
+      })
+    }
   }
 
   const personsToShow = search
@@ -66,7 +72,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} onDelete={handleDelete} />
     </>
   )
 }
