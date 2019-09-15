@@ -5,7 +5,12 @@ import Filter from './Filter'
 import Persons from './Persons'
 import PersonForm from './PersonForm'
 
-import { getPersons, createPerson, deletePerson } from './services/persons'
+import {
+  getPersons,
+  createPerson,
+  deletePerson,
+  updatePerson,
+} from './services/persons'
 
 const App = () => {
   const [ search, setSearch ] = useState('')
@@ -34,15 +39,27 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (persons.find((person) => person.name === newName)) {
-      return alert(`${newName} is already added to the phonebook`)
-    }
+    const exist = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    )
 
-    createPerson({ name: newName, number: newNumber }).then((person) => {
-      setPersons(persons.concat(person))
-      setNewName('')
-      setNewNumber('')
-    })
+    if (exist) {
+      if (window.confirm(
+        `${newName} is already added to the phonebook, replace the old number with a new one?`
+      )) {
+        updatePerson(exist.id, { name: exist.name, number: newNumber }).then((res) => {
+          setPersons(persons.map((person) => res.id === person.id ? res : person))
+          setNewName('')
+          setNewNumber('')
+        })
+      }
+    } else {
+      createPerson({ name: newName, number: newNumber }).then((person) => {
+        setPersons(persons.concat(person))
+        setNewName('')
+        setNewNumber('')
+      })
+    }
   }
 
   const handleDelete = (personToDelete) => () => {
